@@ -1,26 +1,118 @@
 @import "tailwindcss";
+@import "@fontsource-variable/ibm-plex-sans";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --bg: #f5f6f9;
+  --surface: #ffffff;
+  --raised: #f0f2f6;
+  --line: #e2e6ed;
+  --line-strong: #cdd3de;
+  --ink: #0e1626;
+  --muted: #566176;
+  --faint: #8590a4;
+  --accent: #3d55f0;
+  --accent-ink: #ffffff;
+  --accent-soft: #e9ecff;
+  --ai: #6f47e0;
+  --ai-soft: #f0eaff;
+  --pos: #0b8a5f;
+  --pos-soft: #e2f5ee;
+  --neg: #d23b42;
+  --neg-soft: #fdeaeb;
+  --warn: #b76a05;
+  --warn-soft: #fdf1dc;
+  /* chart series — validated categorical order (see docs/ARCHITECTURE.md) */
+  --s-flipkart: #2a78d6;
+  --s-amazon: #eb6834;
+  --s-meta: #1baf7a;
+  --s-spend: #eda100;
+  --s-orders: #e87ba4;
+  --s-revenue: #6250d6;
+  --s-neutral: #aab2c2;
+  --shadow: 0 1px 2px rgb(14 22 38 / 0.05), 0 8px 24px -12px rgb(14 22 38 / 0.12);
 }
+
+.dark {
+  color-scheme: dark;
+  --bg: #090d16;
+  --surface: #0f1522;
+  --raised: #161d2d;
+  --line: #1f283a;
+  --line-strong: #2d3850;
+  --ink: #e9edf5;
+  --muted: #9aa5ba;
+  --faint: #68748b;
+  --accent: #7389ff;
+  --accent-ink: #070b14;
+  --accent-soft: #1a2247;
+  --ai: #a78bff;
+  --ai-soft: #231b45;
+  --pos: #34c796;
+  --pos-soft: #0e2a24;
+  --neg: #f0676c;
+  --neg-soft: #32161b;
+  --warn: #e3a23a;
+  --warn-soft: #2e2210;
+  --s-flipkart: #3987e5;
+  --s-amazon: #d95926;
+  --s-meta: #199e70;
+  --s-spend: #c98500;
+  --s-orders: #d55181;
+  --s-revenue: #9085e9;
+  --s-neutral: #4a556b;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.6);
+}
+
+[data-accent="violet"] { --accent: #6f47e0; --accent-soft: #f0eaff; }
+[data-accent="teal"] { --accent: #0d8f86; --accent-soft: #dff5f3; }
+.dark[data-accent="violet"] { --accent: #a78bff; --accent-soft: #231b45; }
+.dark[data-accent="teal"] { --accent: #35c4b8; --accent-soft: #0d2b2a; }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-ai: var(--ai);
+  --color-ai-soft: var(--ai-soft);
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: var(--shadow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html, body { height: 100%; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
+.tnum { font-variant-numeric: tabular-nums; }
+h1, h2, h3 { letter-spacing: -0.015em; }
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--accent-soft); }
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.recharts-wrapper:focus, .recharts-surface:focus, .recharts-wrapper *:focus { outline: none; }
+
+@keyframes pulse-soft { 50% { opacity: 0.45; } }
+.skeleton { background: var(--raised); border-radius: 6px; animation: pulse-soft 1.4s ease-in-out infinite; }
+@keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.overlay-in { animation: rise 0.16s ease-out; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

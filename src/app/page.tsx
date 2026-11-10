@@ -1,69 +1,75 @@
-import Image from "next/image";
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight, BarChart3, Palette, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { BrandMark } from "@/components/shell/sidebar";
+import { Button, Field, Input, Select } from "@/components/ui";
+import { BRAND_DEFAULTS, DEMO_NOTICE } from "@/config/brand";
+import { ROLE_LABEL, useStore, type Role } from "@/lib/store";
 
-export default function Home() {
+const schema = z.object({
+  name: z.string().trim().min(2, "Enter the name to show in the workspace").max(60),
+  role: z.enum(["admin", "manager", "analyst", "viewer"]),
+});
+type Form = z.infer<typeof schema>;
+
+const POINTS = [
+  { icon: BarChart3, title: "One view of every channel", body: "Amazon, Flipkart and Meta performance, reconciled to the same definitions of revenue, ROAS, ACOS and TACOS." },
+  { icon: Sparkles, title: "Recommendations with their working", body: "Each insight shows the numbers behind it, the suggested action and how it was calculated." },
+  { icon: Palette, title: "Creative Studio built in", body: "Edit ad creatives from placement-sized templates and export them without leaving the workspace." },
+];
+
+export default function Entry() {
+  const router = useRouter();
+  const { session, hydrated, signIn, brand } = useStore();
+  const { register, handleSubmit, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema), defaultValues: { name: "Ananya Rao", role: "admin" } });
+  const enter = (v: Form) => {
+    signIn({ name: v.name, role: v.role as Role, email: "demo.user@entraiot.example" });
+    router.push("/overview");
+  };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]">
+      <section className="flex flex-col justify-between border-b border-line bg-surface px-6 py-8 sm:px-12 lg:border-r lg:border-b-0 lg:py-12">
+        <div className="flex items-center gap-2.5">
+          <BrandMark size={32} />
+          <div className="leading-tight">
+            <p className="text-[15px] font-semibold">{brand.productName}</p>
+            <p className="text-[12px] text-faint">by {BRAND_DEFAULTS.company}</p>
+          </div>
+        </div>
+        <div className="my-10 max-w-xl">
+          <h1 className="text-[34px] leading-[1.12] font-semibold tracking-tight sm:text-[42px]">Know what your marketplaces and ads are doing, and what to do next.</h1>
+          <ul className="mt-9 space-y-5">
+            {POINTS.map((p) => (
+              <li key={p.title} className="flex gap-3.5">
+                <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent"><p.icon className="size-4" /></span>
+                <span><span className="block text-[14.5px] font-semibold">{p.title}</span><span className="block text-[13.5px] text-muted">{p.body}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="text-[12px] text-faint">© {new Date().getFullYear()} {BRAND_DEFAULTS.companyLegal}</p>
+      </section>
+      <section className="flex items-center justify-center px-6 py-10 sm:px-12">
+        <form onSubmit={handleSubmit(enter)} className="w-full max-w-sm" noValidate>
+          <p className="text-[11.5px] font-semibold tracking-wide text-accent">DEMO ENVIRONMENT</p>
+          <h2 className="mt-1 text-[22px] font-semibold">Enter the demo workspace</h2>
+          <p className="mt-1.5 text-[13.5px] text-muted">{DEMO_NOTICE} Three fictional client businesses are preloaded.</p>
+          <div className="mt-6 space-y-4">
+            <Field label="Your name" error={errors.name?.message}><Input {...register("name")} autoComplete="name" /></Field>
+            <Field label="View the workspace as" hint="Roles change what you can do: viewers cannot edit campaigns or export reports.">
+              <Select {...register("role")}>{(Object.keys(ROLE_LABEL) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</Select>
+            </Field>
+            <Button type="submit" variant="primary" className="h-10 w-full" disabled={!hydrated}>Enter demo workspace<ArrowRight /></Button>
+            {hydrated && session && <Button className="h-10 w-full" onClick={() => router.push("/overview")}>Continue as {session.name}</Button>}
+          </div>
+          <p className="mt-6 rounded-lg border border-line bg-raised/60 px-3 py-2.5 text-[12px] leading-relaxed text-muted">
+            Demo entry does not check a password. Production sign-in (Auth.js, role-based access, tenant isolation) is specified in the project documentation and is not active in this build.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </form>
+      </section>
     </div>
   );
 }
