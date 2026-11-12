@@ -27,6 +27,8 @@ const PROMO = ["best", "cheapest", "free", "sale", "offer", "discount", "deal", 
 const SYMBOLS = /[!$?*~^{}¬¦]/;
 const STOP = new Set(["and", "for", "with", "the", "of", "in", "to", "a", "an", "&", "-", "|", "/", "on", "by"]);
 
+/** A size, quantity or measurement: any digit, or a garment size such as M, XL or Free Size. */
+export const hasDetail = (s: string) => /\d/.test(s) || /(^|[\s,(/-])(xxs|xs|s|m|l|xl|xxl|xxxl|free size)($|[\s,)/-])/i.test(s);
 const words = (s: string) => s.toLowerCase().split(/[^\p{L}\p{N}#%.]+/u).filter(Boolean);
 const lines = (s: string) => s.split(/\r?\n/).map((l) => l.replace(/^[\s•*\-–·]+/, "").trim()).filter(Boolean);
 
@@ -72,7 +74,7 @@ export function checkListing(input: ListingInput): ListingReport {
     : { id: "stuffing", label: "No repeated keywords", severity: tl ? "pass" : "warn", detail: tl ? "No word repeated three or more times." : "Enter a title to check.", weight: 8 });
 
   // 5. Specifics in title (a number: size, quantity, capacity)
-  const hasSpec = /\d/.test(title);
+  const hasSpec = hasDetail(title);
   r.push({ id: "specifics", label: "Key detail in title", severity: hasSpec ? "pass" : "warn", detail: hasSpec ? "Includes a size, quantity or measurement." : "No size, quantity, capacity or count found.", fix: hasSpec ? undefined : "Add the detail shoppers filter on, e.g. 500 ml, Pack of 2, Size M.", weight: 7 });
 
   // 6. Bullet points
@@ -108,5 +110,86 @@ export function checkListing(input: ListingInput): ListingReport {
     grade: score >= 80 ? "Strong" : score >= 55 ? "Needs work" : "Weak",
     results: r,
     method: `Rules-based check of the text you entered against common ${mk} listing guidelines. Pass = full points, warning = half, fail = none. It is a guide, not ${mk}'s own quality score, and no live listing is read.`,
+  };
+}
+
+/* ---------------- Auto-fix: rewrite what can be fixed, ask only for facts the seller knows ---------------- */
+
+export interface FixAnswers {
+  detail: string; // size / quantity / measurement, e.g. "500 ml" or "Pack of 2"
+  extraTitle: string; // words to lengthen a short title, e.g. brand, material, colour
+  points: string[]; // answers for missing points (material, size, use, care, in the box)
+  descriptionExtra: string; // a sentence on who it's for / why it's different
+  imageCount: number;
+  whiteMainImage: boolean;
+}
+export const POINT_PROMPTS = ["Material or ingredients", "Size, fit or capacity", "How or where to use it", "Care or storage", "What's in the box"] as const;
+
+const titleCase = (s: string) => s.toLowerCase().replace(/(^|[\s(/-])(\p{L})/gu, (_, a: string, b: string) => a + b.toUpperCase());
+const sentence = (s: string) => { const t = s.trim().replace(/\s+/g, " "); return t ? (t[0].toUpperCase() + t.slice(1)).replace(/([^.!?])$/, "$1.") : ""; };
+
+export function cleanTitle(raw: string, marketplace: Marketplace, maxLen?: number): string {
+  const L = LIMITS[marketplace];
+  let t = ` ${raw.replace(/\s+/g, " ").trim()} `;
+  for (const p of PROMO) t = t.replace(new RegExp(`(?<=\\s)${p.replace(/[.*+?^${}()|[\]\\#%]/g, "\\$&")}(?=[\\s,.!])`, "gi"), " ");
+  t = t.replace(/[!$?*~^{}¬¦]+/g, " ").replace(/\s+/g, " ").replace(/\s+,/g, ",").replace(/(^[\s,|-]+|[\s,|-]+$)/g, "");
+  const letters = t.replace(/[^A-Za-z]/g, "");
+  if (letters.length > 12 && letters.replace(/[^A-Z]/g, "").length / letters.length > 0.6) t = titleCase(t);
+  // keep each meaningful word once
+  const seen = new Map<string, number>();
+  t = t.split(" ").filter((w) => {
+    const k = w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+    if (k.length <= 2 || STOP.has(k)) return true;
+    const n = (seen.get(k) ?? 0) + 1; seen.set(k, n); return n <= 1;
+  }).join(" ");
+  const max = maxLen ?? L.titleIdeal[1];
+  if (t.length > max) {
+    const cut = t.slice(0, max + 1);
+    t = cut.slice(0, cut.lastIndexOf(" ") > 0 ? cut.lastIndexOf(" ") : max).replace(/[\s,|-]+$/, "");
+  }
+  return t;
+}
+
+export interface FixPlan {
+  title: string; bullets: string[]; description: string; imageCount: number; whiteMainImage: boolean;
+  needs: { detail: boolean; extraTitle: boolean; points: number; description: boolean; images: number };
+  report: ListingReport;
+}
+
+/** Builds the corrected listing. When every `needs` item is answered, the report scores 100. */
+export function autoFix(input: ListingInput, a: FixAnswers): FixPlan {
+  const L = LIMITS[input.marketplace];
+  const clean = (x: string) => x.trim().replace(/[!$?*~^{}¬¦]/g, "").replace(/\s+/g, " ");
+  const detail = clean(a.detail);
+  const extra = clean(a.extraTitle);
+  const base = cleanTitle(input.title, input.marketplace, 10_000);
+  const needDetail = !hasDetail(base);
+  const useDetail = needDetail && hasDetail(detail) ? detail : "";
+  // Base words (+ the seller's extra words if the title is short), de-duplicated, trimmed so the detail always fits at the end.
+  const withExtra = base.length + (useDetail ? useDetail.length + 2 : 0) < L.titleIdeal[0] && extra ? `${base} ${extra}` : base;
+  const room = L.titleIdeal[1] - (useDetail ? useDetail.length + 2 : 0);
+  let title = cleanTitle(withExtra, input.marketplace, Math.max(20, room));
+  if (useDetail) title = `${title}, ${useDetail}`;
+
+  const fit = (b: string) => { const s = sentence(b); return s.length > 220 ? s.slice(0, s.lastIndexOf(" ", 215)).replace(/[,;:]$/, "") + "." : s; };
+  let bullets = lines(input.bullets).map(fit).filter((b) => b.length >= 25);
+  const missing = Math.max(0, L.bulletsIdeal - bullets.length);
+  const answered = a.points.map((p, i) => (p.trim() ? fit(`${POINT_PROMPTS[i % POINT_PROMPTS.length]}: ${p.trim()}`) : "")).filter((b) => b.length >= 25);
+  bullets = [...bullets, ...answered.slice(0, missing)];
+  const pointsStillNeeded = Math.max(0, L.bulletsIdeal - bullets.length);
+
+  const descParts = [sentence(input.description), sentence(title), ...bullets.map((b) => sentence(b.replace(/^[^:]{3,40}:\s*/, ""))), sentence(a.descriptionExtra)].filter(Boolean);
+  const description = [...new Set(descParts)].join(" ");
+  const imageCount = Math.max(input.imageCount || 0, a.imageCount || 0);
+  const report = checkListing({ marketplace: input.marketplace, title, bullets: bullets.join("\n"), description, imageCount, whiteMainImage: a.whiteMainImage });
+  return {
+    title, bullets, description, imageCount, whiteMainImage: a.whiteMainImage, report,
+    needs: {
+      detail: !hasDetail(title),
+      extraTitle: title.length < L.titleIdeal[0],
+      points: pointsStillNeeded,
+      description: description.length < 300,
+      images: Math.max(0, L.imagesIdeal - imageCount),
+    },
   };
 }

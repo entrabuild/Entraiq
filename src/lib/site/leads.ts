@@ -3,6 +3,17 @@ import { z } from "zod";
 /** Shared by the public forms (client) and POST /api/v1/leads (server), so both validate the same way. */
 export const SELLER_BANDS = ["1–10", "11–25", "26–50", "51–100", "100+"] as const;
 export const MARKETPLACES = ["Amazon", "Flipkart", "Myntra", "Meta Ads"] as const;
+export const SERVICES = [
+  "E-commerce website",
+  "ENTRAIQ marketplace platform",
+  "SEO",
+  "Social media marketing",
+  "Performance marketing (Meta & Google ads)",
+  "Creative & content",
+  "Mobile app",
+  "AI chatbot & automation",
+  "Something else",
+] as const;
 
 const phone = z.string().trim().regex(/^\+?[0-9 ()-]{10,16}$/, "Enter a valid phone number with at least 10 digits");
 
@@ -32,7 +43,20 @@ export const signupSchema = z.object({
   website: z.string().max(0).optional().default(""),
 });
 
-export const leadSchema = z.discriminatedUnion("kind", [demoRequestSchema, signupSchema]);
+export const enquirySchema = z.object({
+  kind: z.literal("enquiry"),
+  name: z.string().trim().min(2, "Enter your name").max(60),
+  phone,
+  email: z.email("Enter a valid email address"),
+  agency: z.string().trim().max(80).optional().default(""), // business name (optional)
+  interest: z.enum(SERVICES, { message: "Choose what you need help with" }),
+  message: z.string().trim().max(800).optional().default(""),
+  consent: z.literal(true, { message: "Tick this so we can contact you" }),
+  website: z.string().max(0).optional().default(""),
+});
+
+export const leadSchema = z.discriminatedUnion("kind", [demoRequestSchema, signupSchema, enquirySchema]);
+export type Enquiry = z.output<typeof enquirySchema>;
 export type DemoRequest = z.output<typeof demoRequestSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
 export type Lead = z.output<typeof leadSchema>;
@@ -48,6 +72,9 @@ export interface LeadResponse {
 
 /** Plain-text summary used for the alert and the WhatsApp/email hand-off. */
 export function leadSummary(l: Lead, reference: string): string {
+  if (l.kind === "enquiry") {
+    return [`New website enquiry (${reference})`, `Name: ${l.name}`, l.agency ? `Business: ${l.agency}` : "", `Phone: ${l.phone}`, `Email: ${l.email}`, `Needs: ${l.interest}`, l.message ? `Message: ${l.message}` : ""].filter(Boolean).join("\n");
+  }
   const head = l.kind === "demo" ? "New ENTRAIQ demo request" : "New ENTRAIQ agency sign-up";
   const sellers = l.kind === "demo" ? l.sellers : String(l.sellers);
   return [

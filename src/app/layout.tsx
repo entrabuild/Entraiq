@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import { BRAND_DEFAULTS } from "@/config/brand";
+import { SITE } from "@/config/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${BRAND_DEFAULTS.productName} — ${BRAND_DEFAULTS.tagline}`,
-  description: `${BRAND_DEFAULTS.productName} by ${BRAND_DEFAULTS.company}: marketplace, advertising and AI intelligence in one workspace. Demo environment with sample data.`,
+  metadataBase: new URL(SITE.url),
+  title: { default: `Entraiot — websites, marketing and ${BRAND_DEFAULTS.productName}`, template: `%s` },
+  description: `${BRAND_DEFAULTS.company}: e-commerce websites, SEO, social media marketing and ${BRAND_DEFAULTS.productName}, the ${BRAND_DEFAULTS.tagline.toLowerCase()} for agencies.`,
+  applicationName: BRAND_DEFAULTS.productName,
+  openGraph: { type: "website", siteName: "Entraiot · ENTRAIQ", locale: "en_IN", url: "/" },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true },
 };
 
 // Applies the saved theme before first paint so the page never flashes the wrong colours.

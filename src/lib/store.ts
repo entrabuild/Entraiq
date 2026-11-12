@@ -32,7 +32,7 @@ export interface AuditEntry { id: string; ts: number; actor: string; action: str
 export interface ReportRecord { id: string; ts: number; type: string; title: string; client: string; range: string; format: "CSV" | "PDF"; rows: number; by: string }
 export interface Upload { id: string; name: string; src: string; w: number; h: number }
 /** An enquiry or sign-up sent from the public website in this browser (the server copy goes to the alert webhook). */
-export interface SiteLead { id: string; ts: number; kind: "demo" | "signup"; reference: string; name: string; agency: string; email: string; phone: string; sellers: string; marketplaces: string[]; alert: "sent" | "pending_configuration" | "failed" | "not_sent" }
+export interface SiteLead { id: string; ts: number; kind: "demo" | "signup" | "enquiry"; reference: string; name: string; agency: string; email: string; phone: string; sellers: string; marketplaces: string[]; alert: "sent" | "pending_configuration" | "failed" | "not_sent" }
 export interface AgencyWorkspace { agency: string; owner: string; email: string; sellersPlanned: number; marketplaces: string[]; createdAt: number }
 
 const uid = () => Math.random().toString(36).slice(2, 10);

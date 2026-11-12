@@ -34,7 +34,9 @@ count, and convenience.
    integration.
 3. **No fabricated records.** The app does not generate receipts, confirmations, reviews, or
    endorsements presented as genuine. The public website carries no invented testimonials, client
-   logos or performance statistics, and does not copy any competitor's wording, design or branding.
+   logos or performance statistics (stat slots stay hidden until real numbers are entered), and does
+   not copy any competitor's wording, design or branding. Fee calculators show their sources and
+   check date, mark estimates, and let every rate be edited.
 4. **AI output is labelled.** Insights are computed from the sample data and surfaced as
    demo-generated; they carry a `method` and an honest, heuristic confidence (not a statistical
    probability).
@@ -63,7 +65,7 @@ against demo state:
 | I | **Reports** | Sales/ads/marketplace/product/campaign reports; CSV + PDF export of the data actually shown, logged to history |
 | J | **Clients** | Agency view: client list/profile, team, accounts, activity, reports, add-client onboarding |
 | K | **Admin/Settings** | Users, roles, permissions (RBAC), workspace/brand/AI settings, notifications, audit log, Reset Demo Data |
-| L | **Public website** (`/`) | ENTRAIQ product site for agencies: how it works, modules (honest demo/rollout status), connection status table, pricing + fee calculator, free listing check, FAQ, demo-request form, agency self sign-up (`/signup`) that creates a demo workspace, Website leads page (`/leads`). Demo entry moved to `/login`. Lead alerts go to `LEAD_WEBHOOK_URL`; unset = *pending configuration* |
+| L | **Public website** (`/`) — production | Entraiot's live site (tech services only — no seller account management, so we never compete with agencies using ENTRAIQ): animated hero, services, strategy, free tools (listing check with auto-fix to 100/100; 9 marketplace fee calculators as pop-ups), portfolio, technology stack, social media marketing, ENTRAIQ platform + pricing, FAQ, enquiry form, full footer, sticky WhatsApp/Call bar, policies, SEO (sitemap, robots, structured data, preview image). `/signup` creates a browser workspace; `/leads` lists website leads; platform preview at `/login` stays clearly labelled sample data. Settings in `src/config/site.ts`; see `docs/WEBSITE.md` |
 
 **Cross-cutting, in scope:** consistent app shell (collapsible sidebar, topbar), global date-range
 / marketplace / client selectors, dark + light themes, responsive down to 390px, demo state
@@ -183,4 +185,4 @@ connector credentials) matter only for §9. Full detail: [`docs/DEPLOYMENT.md`](
 
 ---
 
-_Last updated: 2026-11-12 (public website added). Owners: Salvin Jones (Founder & Director), Shalini L (MD & CEO). Governs `docs/` — if they disagree, this file wins._
+_Last updated: 2026-11-12 (public website made production: real contacts, calculators, SEO). Owners: Salvin Jones (Founder & Director), Shalini L (MD & CEO). Governs `docs/` — if they disagree, this file wins._

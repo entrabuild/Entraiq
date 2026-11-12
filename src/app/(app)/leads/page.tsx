@@ -18,7 +18,7 @@ export default function LeadsPage() {
   const workspace = useStore((s) => s.workspace);
   return (
     <>
-      <PageHeader title="Website leads" description="Demo requests and agency sign-ups sent from the ENTRAIQ website in this browser. The server sends each one to the alert webhook when LEAD_WEBHOOK_URL is configured." />
+      <PageHeader title="Website leads" description="Enquiries, demo requests and agency sign-ups sent from the website in this browser. The server sends each one to the alert webhook when LEAD_WEBHOOK_URL is configured." />
       {workspace && (
         <Card className="mb-4 px-5 py-4 text-[13px]">
           <p className="font-semibold">{workspace.agency} workspace</p>
@@ -33,13 +33,13 @@ export default function LeadsPage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-[13px]">
               <thead className="border-y border-line bg-raised text-[12px] text-muted">
-                <tr>{["Received", "Type", "Reference", "Name", "Agency", "Contact", "Sellers", "Marketplaces", "Alert"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}</tr>
+                <tr>{["Received", "Type", "Reference", "Name", "Business", "Contact", "Sellers", "Interest / marketplaces", "Alert"].map((h) => <th key={h} className="px-4 py-2 font-medium">{h}</th>)}</tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {leads.map((l) => (
                   <tr key={l.id}>
                     <td className="px-4 py-2.5 whitespace-nowrap text-muted">{fmtDateTime(l.ts)}</td>
-                    <td className="px-4 py-2.5"><Badge tone={l.kind === "signup" ? "accent" : "neutral"}>{l.kind === "signup" ? "Sign-up" : "Demo request"}</Badge></td>
+                    <td className="px-4 py-2.5"><Badge tone={l.kind === "signup" ? "accent" : l.kind === "enquiry" ? "ai" : "neutral"}>{l.kind === "signup" ? "Sign-up" : l.kind === "enquiry" ? "Enquiry" : "Demo request"}</Badge></td>
                     <td className="tnum px-4 py-2.5">{l.reference}</td>
                     <td className="px-4 py-2.5 font-medium">{l.name}</td>
                     <td className="px-4 py-2.5">{l.agency}</td>

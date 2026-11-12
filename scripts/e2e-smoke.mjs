@@ -322,33 +322,54 @@ await step("responsive", async () => {
 // ---- Public website & automations -----------------------------------------------------------------
 await step("website", async () => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  const bad = await ctx.request.post(`${BASE}/api/v1/leads`, { data: { kind: "demo", name: "" } });
+  const bad = await ctx.request.post(`${BASE}/api/v1/leads`, { data: { kind: "enquiry", name: "" } });
   check(bad.status() === 422, "POST /api/v1/leads rejects an invalid enquiry with field errors");
+  const robots = await (await ctx.request.get(`${BASE}/robots.txt`)).text();
+  const sitemap = await (await ctx.request.get(`${BASE}/sitemap.xml`)).text();
+  check(robots.includes("Sitemap:") && sitemap.includes("/privacy"), "robots.txt and sitemap.xml are served");
   await page.goto(`${BASE}/`);
-  await page.getByRole("heading", { name: "Run every seller you manage from one screen." }).waitFor();
-  check(true, "home page shows the ENTRAIQ website");
-  // Listing check
+  await page.getByRole("heading", { name: /Build your brand/ }).waitFor();
+  check(await page.locator('script[type="application/ld+json"]').count() === 1, "home page shows the website with structured data for search engines");
+  check(await page.getByText("reach@entrabuild.com").first().isVisible() && await page.getByText("+91 81245 45524").first().isVisible(), "real contact email and phone are shown");
+  // Listing check + auto-fix to 100
   await page.getByRole("button", { name: "Check this listing" }).click();
   check(await page.getByText("How this is scored:").isVisible(), "free listing check returns a scored report with its method");
-  // Fee calculator
+  await page.getByRole("button", { name: "Fix it to 100%" }).click();
+  await page.getByLabel("Material or ingredients").fill("Pure handloom cotton woven on a pit loom");
+  await page.getByLabel("Images you'll upload").fill("6");
+  await page.getByText("100/100 — ready to paste").waitFor();
+  check(true, "auto-fix reaches 100/100 once the seller answers the questions it asks");
+  // Fee calculator pop-ups
+  await page.goto(`${BASE}/#calc-amazon`);
+  await page.getByRole("dialog", { name: "Amazon.in fee calculator" }).waitFor();
+  check(await page.getByText("Reaches your bank").isVisible(), "Amazon fee calculator opens as a pop-up with payout and profit");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Calculators" }).hover();
+  await page.getByRole("link", { name: "Flipkart fee calculator" }).first().click();
+  check(await page.getByRole("dialog", { name: "Flipkart fee calculator" }).isVisible(), "Calculators menu opens the Flipkart calculator");
+  await page.keyboard.press("Escape");
+  // ENTRAIQ pricing calculator
   await page.getByLabel("Seller accounts, exact number").fill("40");
-  check(await page.getByText("₹75,000").first().isVisible(), "fee calculator: 40 sellers = ₹75,000 a month");
-  // Demo request
-  await page.getByRole("button", { name: "Request a demo" }).click();
-  check(await page.getByText("Enter your name").isVisible(), "demo form validates required fields");
-  await page.getByLabel("Your name").fill("Smoke Test");
-  await page.getByLabel("Agency or company").fill("Test Agency");
-  await page.getByLabel("Work email").fill("smoke@example.com");
-  await page.getByLabel("Phone (WhatsApp preferred)").fill("+91 98765 43210");
-  await page.getByLabel("Sellers you manage").selectOption("11–25");
-  await page.getByRole("checkbox", { name: "Amazon" }).check();
-  await page.getByText("may contact me about ENTRAIQ").click();
-  await page.getByRole("button", { name: "Request a demo" }).click();
-  await page.getByText(/Your reference is ENQ-/).waitFor();
-  check(true, "demo request is accepted and returns a reference");
+  check(await page.getByText("₹75,000").first().isVisible(), "ENTRAIQ pricing: 40 sellers = ₹75,000 a month");
+  // Enquiry form
+  const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Get my free consultation" }) }).first();
+  await form.getByRole("button", { name: "Get my free consultation" }).click();
+  check(await form.getByText("Enter your name").isVisible(), "enquiry form validates required fields");
+  await form.getByLabel("Your name").fill("Smoke Test");
+  await form.getByLabel("Phone / WhatsApp").fill("+91 98765 43210");
+  await form.getByLabel("Email").fill("smoke@example.com");
+  await form.getByLabel("What do you need?").selectOption("SEO");
+  await form.getByText("may contact me by phone").click();
+  await form.getByRole("button", { name: "Get my free consultation" }).click();
+  await page.getByText(/Reference ENQ-/).waitFor();
+  check(true, "enquiry is accepted and returns a reference");
+  check(await page.getByRole("link", { name: "WhatsApp" }).first().isVisible() && await page.getByRole("link", { name: "Call now" }).isVisible(), "sticky WhatsApp / Call now bar is visible");
   const overflow = await page.setViewportSize({ width: 390, height: 844 }).then(() => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth));
   check(overflow <= 1, `no horizontal overflow on the website at 390px (overflow ${overflow}px)`);
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${BASE}/privacy`);
+  check(await page.getByRole("heading", { name: "Privacy policy" }).isVisible(), "policy pages load");
+  await page.goto(`${BASE}/`);
   await shot("09-website");
   // Self sign-up → workspace
   await page.goto(`${BASE}/signup?sellers=12`);
@@ -363,7 +384,7 @@ await step("website", async () => {
   check(st.workspace?.agency === "Smoke Growth Agency" && st.settings.workspaceName === "Smoke Growth Agency workspace", "sign-up creates the agency workspace and signs the owner in");
   await page.goto(`${BASE}/leads`);
   await page.getByRole("heading", { name: "Website leads" }).waitFor();
-  check((await page.getByText(/^(ENQ|SGN)-/).count()) >= 2, "Website leads lists the demo request and the sign-up");
+  check((await page.getByText(/^(ENQ|SGN|DEM)-/).count()) >= 2, "Website leads lists the enquiry and the sign-up");
 });
 
 check(consoleErrors.length === 0, `no browser console errors across the run${consoleErrors.length ? ":\n        " + [...new Set(consoleErrors)].slice(0, 8).join("\n        ") : ""}`);

@@ -43,7 +43,7 @@ _Last verified: production build ✅, `typecheck` ✅, `verify:data` ✅, 60-che
 | I. Reports | ✅ | Sales/ads/marketplace/product/campaign; CSV + PDF export |
 | J. Client management | ✅ | Client list/profile, team, accounts, activity, reports; add-client onboarding |
 | K. Admin settings | ✅ | Users, roles, permissions (RBAC), workspace/brand/AI settings, notifications, audit log |
-| L. Public website | ✅ (not yet build-verified) | `/` product site, `/signup` self sign-up → demo workspace, `/leads` Website leads, `POST /api/v1/leads` with zod validation, rate limit, honeypot and webhook alert; demo entry moved to `/login` |
+| L. Public website | ✅ (not yet build-verified) | Production website at `/` (see docs/WEBSITE.md): services, free tools, 9 fee calculators, listing auto-fix, portfolio, SEO, policies, enquiry/sign-up with webhook alerts; platform preview at `/login` |
 
 Phases 1–8 (foundation → dashboard → marketplaces → advertising → AI → studio → client/admin → QA)
 are complete.

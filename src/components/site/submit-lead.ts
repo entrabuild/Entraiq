@@ -20,11 +20,11 @@ export async function submitLead(lead: Lead): Promise<LeadResponse> {
       kind: lead.kind,
       reference: res.reference,
       name: lead.name,
-      agency: lead.agency,
+      agency: lead.agency || "—",
       email: lead.email,
       phone: lead.phone,
-      sellers: String(lead.sellers),
-      marketplaces: [...lead.marketplaces],
+      sellers: lead.kind === "enquiry" ? "—" : String(lead.sellers),
+      marketplaces: lead.kind === "enquiry" ? [lead.interest] : [...lead.marketplaces],
       alert: res.alert ?? "not_sent",
     });
   }
@@ -36,6 +36,6 @@ export function contactLinks(lead: Lead, reference: string) {
   const text = leadSummary(lead, reference);
   return {
     whatsapp: BRAND_DEFAULTS.whatsapp ? `https://wa.me/${BRAND_DEFAULTS.whatsapp}?text=${encodeURIComponent(text)}` : null,
-    email: `mailto:${BRAND_DEFAULTS.contactEmail}?subject=${encodeURIComponent(`ENTRAIQ enquiry ${reference}`)}&body=${encodeURIComponent(text)}`,
+    email: `mailto:${BRAND_DEFAULTS.contactEmail}?subject=${encodeURIComponent(`Website enquiry ${reference}`)}&body=${encodeURIComponent(text)}`,
   };
 }

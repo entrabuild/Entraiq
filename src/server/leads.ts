@@ -26,5 +26,5 @@ export async function sendLeadAlert(lead: Lead, reference: string): Promise<"sen
 export function newReference(kind: Lead["kind"]): string {
   const d = new Date();
   const ymd = `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
-  return `${kind === "demo" ? "ENQ" : "SGN"}-${ymd}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  return `${kind === "signup" ? "SGN" : kind === "demo" ? "DEM" : "ENQ"}-${ymd}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 }

@@ -1,8 +1,8 @@
 "use client";
-import { CircleAlert, CircleCheck, CircleX, ScanSearch } from "lucide-react";
+import { Check, CircleAlert, CircleCheck, CircleX, Copy, ScanSearch, Wand2 } from "lucide-react";
 import * as React from "react";
 import { Button, Field, Input, Segmented, Textarea, cn } from "@/components/ui";
-import { checkListing, MARKETPLACE_LABEL, type ListingReport, type Marketplace } from "@/lib/site/listing-check";
+import { autoFix, checkListing, MARKETPLACE_LABEL, POINT_PROMPTS, type FixAnswers, type FixPlan, type ListingInput, type ListingReport, type Marketplace } from "@/lib/site/listing-check";
 
 const EXAMPLE = {
   title: "Handloom Cotton Saree for Women with Blouse Piece, Mustard Yellow, 5.5 m",
@@ -22,11 +22,13 @@ export function ListingChecker() {
   const [white, setWhite] = React.useState(true);
   const [report, setReport] = React.useState<ListingReport | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [fixOpen, setFixOpen] = React.useState(false);
 
   const run = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim().length < 5) { setError("Enter the product title (at least 5 characters) to run the check."); setReport(null); return; }
     setError(null);
+    setFixOpen(false);
     setReport(checkListing({ marketplace: mk, title, bullets, description, imageCount: Number(images) || 0, whiteMainImage: white }));
   };
 
@@ -82,8 +84,73 @@ export function ListingChecker() {
               })}
             </ul>
             <p className="mt-5 border-t border-line pt-3 text-[12px] text-faint">How this is scored: {report.method}</p>
+            {report.score < 100 && !fixOpen && (
+              <Button variant="primary" className="mt-4 h-10 w-full" onClick={() => setFixOpen(true)}><Wand2 />Fix it to 100%</Button>
+            )}
           </>
         )}
+      </div>
+      {report && fixOpen && (
+        <AutoFixPanel input={{ marketplace: mk, title, bullets, description, imageCount: Number(images) || 0, whiteMainImage: white }}
+          onApply={(p) => { setTitle(p.title); setBullets(p.bullets.join("\n")); setDescription(p.description); setImages(String(p.imageCount)); setWhite(p.whiteMainImage); setReport(p.report); setFixOpen(false); }} />
+      )}
+    </div>
+  );
+}
+
+function CopyBtn({ text, label }: { text: string; label: string }) {
+  const [done, setDone] = React.useState(false);
+  return (
+    <button type="button" className="inline-flex items-center gap-1 text-[12px] font-medium text-accent"
+      onClick={() => { navigator.clipboard?.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 1500); }).catch(() => undefined); }}>
+      {done ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}{done ? "Copied" : label}
+    </button>
+  );
+}
+
+function AutoFixPanel({ input, onApply }: { input: ListingInput; onApply: (p: FixPlan) => void }) {
+  const [a, setA] = React.useState<FixAnswers>({ detail: "", extraTitle: "", points: ["", "", "", "", ""], descriptionExtra: "", imageCount: input.imageCount, whiteMainImage: true });
+  const plan = autoFix(input, a);
+  const n = plan.needs;
+  const asks = (n.detail ? 1 : 0) + (n.extraTitle ? 1 : 0) + n.points + (n.description ? 1 : 0) + (n.images ? 1 : 0) + (a.whiteMainImage ? 0 : 1);
+  const upd = (p: Partial<FixAnswers>) => setA((x) => ({ ...x, ...p }));
+  // Which point prompts to show: as many as are still missing, starting from the first unanswered ones.
+  const answeredPts = a.points.filter((p) => p.trim()).length;
+  const showPts = Math.min(5, answeredPts + n.points);
+  return (
+    <div className="overlay-in rounded-xl border border-accent/40 bg-surface p-5 sm:p-6 lg:col-span-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className={cn("tnum flex size-14 items-center justify-center rounded-full border-4 text-[18px] font-semibold transition-colors", plan.report.score === 100 ? "border-pos text-pos" : "border-warn text-warn")}>{plan.report.score}</div>
+          <div>
+            <p className="text-[16px] font-semibold">{plan.report.score === 100 ? "100/100 — ready to paste" : "Auto-fixed. A few facts only you know:"}</p>
+            <p className="text-[13px] text-muted">{plan.report.score === 100 ? "Every check passes. Copy the parts below or apply them to the checker." : `${asks} answer${asks === 1 ? "" : "s"} left to reach 100. We removed sales words, symbols, capitals and repeats, and rewrote the description.`}</p>
+          </div>
+        </div>
+        <Button variant="primary" disabled={plan.report.score < 100} onClick={() => onApply(plan)}><Check />Apply to checker</Button>
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
+        <div className="min-w-0 space-y-3">
+          {(n.detail || a.detail) && <Field label="Size, quantity or measurement" hint="e.g. 500 ml · Pack of 2 · Size M · 5.5 m"><Input value={a.detail} onChange={(e) => upd({ detail: e.target.value })} /></Field>}
+          {(n.extraTitle || a.extraTitle) && <Field label="Add to the title: brand, material, colour or who it's for" hint="Your title is short — these are the words shoppers search for"><Input value={a.extraTitle} onChange={(e) => upd({ extraTitle: e.target.value })} /></Field>}
+          {Array.from({ length: showPts }, (_, i) => (
+            <Field key={i} label={POINT_PROMPTS[i]} hint={a.points[i].trim() && `${POINT_PROMPTS[i]}: ${a.points[i]}`.length < 25 ? "Add a few more words" : undefined}>
+              <Input value={a.points[i]} onChange={(e) => upd({ points: a.points.map((p, j) => (j === i ? e.target.value : p)) })} />
+            </Field>
+          ))}
+          {(n.description || a.descriptionExtra) && <Field label="One line on who it's for or what makes it different"><Textarea rows={2} value={a.descriptionExtra} onChange={(e) => upd({ descriptionExtra: e.target.value })} /></Field>}
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Images you'll upload" hint={n.images ? `${n.images} more needed` : "Enough"}><Input type="number" min={0} max={20} value={String(a.imageCount)} onChange={(e) => upd({ imageCount: Number(e.target.value) || 0 })} /></Field>
+            <label className="flex items-end gap-2 pb-2 text-[13px]"><input type="checkbox" checked={a.whiteMainImage} onChange={(e) => upd({ whiteMainImage: e.target.checked })} className="accent-[var(--accent)]" />Main image on white</label>
+          </div>
+        </div>
+        <div className="min-w-0 space-y-3 rounded-lg bg-raised p-4 text-[13px]">
+          <div><div className="flex items-center justify-between"><p className="font-medium">Title</p><CopyBtn text={plan.title} label="Copy" /></div><p className="mt-1 break-words">{plan.title}</p></div>
+          <div><div className="flex items-center justify-between"><p className="font-medium">Key points</p><CopyBtn text={plan.bullets.join("\n")} label="Copy" /></div>
+            <ul className="mt-1 list-disc space-y-0.5 pl-4">{plan.bullets.map((b) => <li key={b}>{b}</li>)}</ul></div>
+          <div><div className="flex items-center justify-between"><p className="font-medium">Description</p><CopyBtn text={plan.description} label="Copy" /></div><p className="mt-1 text-muted">{plan.description}</p></div>
+        </div>
       </div>
     </div>
   );
