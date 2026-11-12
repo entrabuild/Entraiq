@@ -131,7 +131,7 @@ export function iqReply(state: IQState, raw: string): IQTurn {
   if (s.stage === "lead_email") {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(text)) return say({ text: "Please send a valid email address, like name@business.com." });
     s.lead.email = text; s.stage = "lead_need";
-    return say({ text: "Last one — what do you need help with?", chips: SERVICES.filter((x) => x !== "Something else").concat("Something else") });
+    return say({ text: "Last one — what do you need help with?", chips: [...SERVICES] });
   }
   if (s.stage === "lead_need") {
     const interest = SERVICES.find((x) => norm(x) === t) ?? SERVICES.find((x) => t && norm(x).includes(t)) ?? "Something else";
