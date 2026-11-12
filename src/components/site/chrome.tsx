@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpRight, ChevronDown, ChevronRight, Mail, MapPin, Menu, MessageCircle, Moon, Phone, Sun, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight, Mail, MapPin, Menu, MessageCircle, Phone, X } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { BrandMark } from "@/components/shell/sidebar";
@@ -7,7 +7,6 @@ import { Button, cn } from "@/components/ui";
 import { SITE, socialLinks, telHref, waHref } from "@/config/site";
 import { FEE_CONFIGS } from "@/lib/site/fees";
 import { SERVICES } from "@/lib/site/leads";
-import { useStore } from "@/lib/store";
 import { CALC_GROUPS, calcHref } from "./fee-calculators";
 import { useScrolled } from "./use-browser";
 
@@ -52,8 +51,6 @@ function ServicesMenu() {
 }
 
 export function SiteHeader() {
-  const theme = useStore((s) => s.theme);
-  const set = useStore((s) => s.set);
   const [open, setOpen] = React.useState(false);
   const scrolled = useScrolled();
   return (
@@ -61,7 +58,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-15 max-w-6xl items-center gap-5 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2" aria-label="ENTRAIQ home">
           <BrandMark size={30} />
-          <span className="leading-none"><span className="block text-[15px] font-semibold tracking-tight">ENTRAIQ</span><span className="block text-[10.5px] text-faint">by Entraiot Solutions</span></span>
+          <span className="leading-none"><span className="font-royal block text-[19px] font-semibold tracking-[0.06em] text-accent">ENTRAIQ</span><span className="block text-[10.5px] text-faint">by Entraiot Solutions</span></span>
         </Link>
         <nav className="ml-3 hidden items-center gap-5 lg:flex" aria-label="Site">
           <ServicesMenu />
@@ -69,9 +66,8 @@ export function SiteHeader() {
           {NAV.map(([href, label]) => <a key={href} href={href} className="text-[13.5px] font-medium text-muted hover:text-ink">{label}</a>)}
         </nav>
         <div className="ml-auto flex items-center gap-1.5">
-          <Button variant="ghost" size="icon" aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"} onClick={() => set({ theme: theme === "dark" ? "light" : "dark" })}>{theme === "dark" ? <Sun /> : <Moon />}</Button>
           <Link href="/login" className="hidden h-9 items-center rounded-md px-3 text-[13px] font-medium text-muted hover:bg-raised hover:text-ink md:inline-flex">Platform login</Link>
-          <a href="#enquiry" className="pulse-ring hidden h-9 items-center rounded-md bg-accent px-3.5 text-[13px] font-semibold text-accent-ink hover:brightness-110 sm:inline-flex">Get free consultation</a>
+          <a href="#enquiry" className="shimmer pulse-ring hidden h-9 items-center rounded-full bg-gradient-to-r from-[#f3d98b] via-accent to-[#b8892b] px-4 text-[13px] font-semibold text-accent-ink hover:brightness-110 sm:inline-flex">Get free consultation</a>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
         </div>
       </div>
@@ -105,7 +101,7 @@ export function SiteFooter() {
     <footer id="contact" className="scroll-mt-16 border-t border-line bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 pt-14 pb-10 sm:px-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
-          <div className="flex items-center gap-2"><BrandMark size={30} /><span className="leading-none"><span className="block font-semibold">ENTRAIQ</span><span className="block text-[11px] text-faint">by Entraiot Solutions</span></span></div>
+          <div className="flex items-center gap-2"><BrandMark size={30} /><span className="leading-none"><span className="font-royal block text-[18px] font-semibold tracking-[0.06em] text-accent">ENTRAIQ</span><span className="block text-[11px] text-faint">by Entraiot Solutions</span></span></div>
           <p className="mt-3 text-[13.5px] text-muted">Websites, marketing and the ENTRAIQ platform for brands and agencies selling online. Built in Chennai.</p>
           <a href="#enquiry" className="mt-4 inline-flex h-9 items-center rounded-md bg-accent px-3.5 text-[13px] font-semibold text-accent-ink">Get free consultation</a>
         </div>
@@ -143,23 +139,10 @@ export function SiteFooter() {
           <FL href="/terms">Terms and conditions</FL>
         </FootCol>
       </div>
-      <div className="border-t border-line px-4 py-5 pb-20 text-center text-[12px] text-faint sm:pb-5">
+      <div className="border-t border-line px-4 py-5 pb-24 text-center text-[12px] text-faint">
         <p>© {new Date().getFullYear()} {SITE.company}. All rights reserved.</p>
         <p className="mt-1">Amazon, Flipkart, Myntra, Meesho, JioMart, eBay, Etsy, Blinkit, Zepto, Swiggy Instamart and Meta are trademarks of their owners. We are not affiliated with or endorsed by them.</p>
       </div>
     </footer>
-  );
-}
-
-/** Bottom bar (all screens) + side Enquiry tab, like a shop counter that's always open. */
-export function ContactDock() {
-  return (
-    <>
-      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 text-[14px] font-semibold text-white shadow-[0_-4px_16px_rgb(0_0_0/0.12)]" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-        <a href={waHref("Hi Entraiot, I'd like to know more about your services.")} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 bg-[#1faa55] hover:brightness-110"><MessageCircle className="size-5" />WhatsApp</a>
-        <a href={telHref(SITE.contact.phones[0])} className="flex h-12 items-center justify-center gap-2 bg-accent text-accent-ink hover:brightness-110"><Phone className="size-5" />Call now</a>
-      </div>
-      <a href="#enquiry" className="fixed top-1/2 right-0 z-40 hidden -translate-y-1/2 rounded-l-lg bg-neg px-2 py-4 text-[13px] font-semibold tracking-wide text-white shadow-card [writing-mode:vertical-rl] hover:pr-3 sm:block">Enquiry</a>
-    </>
   );
 }

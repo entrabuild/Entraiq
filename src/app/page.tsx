@@ -1,7 +1,9 @@
 import { Bell, Check, FileText, LayoutDashboard, Megaphone, Palette, ScanSearch, Sparkles, Store, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ContactDock, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { IQChat } from "@/components/site/iq-chat";
+import { ROYAL } from "./site-fonts";
 import { EnquiryForm, EnquiryModal } from "@/components/site/enquiry";
 import { FeeCalculator } from "@/components/site/fee-calculator";
 import { FeeCalculatorModal } from "@/components/site/fee-calculators";
@@ -60,7 +62,7 @@ function JsonLd() {
 
 export default function Home() {
   return (
-    <div className="min-h-dvh pb-12">
+    <div className={`${ROYAL} min-h-dvh`}>
       <JsonLd />
       <SiteHeader />
       <main>
@@ -87,7 +89,7 @@ export default function Home() {
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {MODULES.map((m, i) => (
                 <Reveal key={m.title} delay={i * 40}>
-                  <div className="h-full rounded-2xl border border-line bg-surface p-5">
+                  <div className="gold-frame h-full rounded-2xl border border-line bg-surface p-5 transition-transform hover:-translate-y-1">
                     <m.icon className="size-5 text-accent" aria-hidden />
                     <p className="mt-3 text-[15px] font-semibold">{m.title}</p>
                     <p className="mt-1 text-[13.5px] text-muted">{m.body}</p>
@@ -136,13 +138,13 @@ export default function Home() {
               </ul>
             </Reveal>
           </div>
-          <Reveal className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6"><EnquiryForm /></Reveal>
+          <Reveal className="gold-frame rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6"><EnquiryForm /></Reveal>
         </section>
 
         <CtaBand />
       </main>
       <SiteFooter />
-      <ContactDock />
+      <IQChat />
       <FeeCalculatorModal />
       <EnquiryModal />
     </div>

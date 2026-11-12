@@ -363,7 +363,17 @@ await step("website", async () => {
   await form.getByRole("button", { name: "Get my free consultation" }).click();
   await page.getByText(/Reference ENQ-/).waitFor();
   check(true, "enquiry is accepted and returns a reference");
-  check(await page.getByRole("link", { name: "WhatsApp" }).first().isVisible() && await page.getByRole("link", { name: "Call now" }).isVisible(), "sticky WhatsApp / Call now bar is visible");
+  await page.getByRole("button", { name: "Chat with IQ" }).click();
+  const iq = page.getByRole("dialog", { name: "Chat with IQ" });
+  await iq.getByLabel("Message IQ").fill("Amazon fee for ₹999");
+  await iq.getByRole("button", { name: "Send" }).click();
+  await iq.getByText(/reaches your bank/).waitFor();
+  check(true, "IQ chat answers a fee question in the chat");
+  await iq.getByLabel("Message IQ").fill("ENTRAIQ price for 20 sellers");
+  await iq.getByRole("button", { name: "Send" }).click();
+  await iq.getByText(/₹45,000\/month/).waitFor();
+  check(true, "IQ quotes ENTRAIQ pricing");
+  await page.keyboard.press("Escape");
   const overflow = await page.setViewportSize({ width: 390, height: 844 }).then(() => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth));
   check(overflow <= 1, `no horizontal overflow on the website at 390px (overflow ${overflow}px)`);
   await page.setViewportSize({ width: 1440, height: 900 });

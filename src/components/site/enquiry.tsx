@@ -9,6 +9,7 @@ import { Button, Field, Input, Select, Textarea } from "@/components/ui";
 import { SITE, telHref } from "@/config/site";
 import { enquirySchema, SERVICES, type Enquiry } from "@/lib/site/leads";
 import { contactLinks, submitLead } from "./submit-lead";
+import { ROYAL } from "@/app/site-fonts";
 import { clearHash, useHash } from "./use-browser";
 
 type FormIn = z.input<typeof enquirySchema>;
@@ -85,10 +86,10 @@ export function EnquiryModal() {
     <D.Root open={open} onOpenChange={(o) => !o && close()}>
       <D.Portal>
         <D.Overlay className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-[2px]" />
-        <D.Content className="overlay-in fixed top-1/2 left-1/2 z-[60] max-h-[92vh] w-[calc(100vw-1.5rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-line bg-surface p-5 shadow-card">
+        <D.Content className={`${ROYAL} overlay-in fixed top-1/2 left-1/2 z-[60] max-h-[92vh] w-[calc(100vw-1.5rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-line p-5 shadow-card`}>
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
-              <D.Title className="text-[18px] font-semibold">Free consultation</D.Title>
+              <D.Title className="font-royal text-[26px]">Free consultation</D.Title>
               <D.Description className="mt-0.5 text-[13px] text-muted">Tell us what you need. We reply within one working day.</D.Description>
             </div>
             <D.Close asChild><Button variant="ghost" size="icon" aria-label="Close"><X /></Button></D.Close>

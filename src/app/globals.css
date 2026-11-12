@@ -141,4 +141,30 @@ h1, h2, h3 { letter-spacing: -0.015em; }
 .grid-fade { background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%); }
 .word-rotate > span { display: inline-block; animation: word-in 0.5s cubic-bezier(.2,.8,.2,1); }
 @keyframes word-in { from { transform: translateY(60%); opacity: 0; } }
+/* ---------- Royal theme: public website only (midnight navy, gold, serif display) ---------- */
+.royal {
+  --bg: #070b1e; --surface: #0d1430; --raised: #141c42;
+  --line: rgb(212 175 55 / 0.16); --line-strong: rgb(212 175 55 / 0.34);
+  --ink: #f6f0e1; --muted: #bdb6a4; --faint: #8c8676;
+  --accent: #d4af37; --accent-ink: #1a1203; --accent-soft: rgb(212 175 55 / 0.12);
+  --ai: #a8802a; --ai-soft: rgb(168 128 42 / 0.16); --s-meta: #f1dfa6;
+  --shadow: 0 1px 0 rgb(212 175 55 / 0.08) inset, 0 18px 40px -18px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(212 175 55 / 0.05);
+  color-scheme: dark; color: var(--ink);
+  background:
+    radial-gradient(1100px 520px at 50% -8%, rgb(212 175 55 / 0.14), transparent 70%),
+    radial-gradient(800px 500px at 100% 40%, rgb(88 70 180 / 0.10), transparent 70%),
+    var(--bg);
+}
+.royal h1, .royal h2, .royal .font-royal { font-family: var(--font-royal), "Cormorant Garamond", Georgia, serif; font-weight: 600; letter-spacing: -0.005em; }
+.royal h1 { line-height: 1.02; }
+.royal .text-gradient { background-image: linear-gradient(100deg, #b8892b 0%, #f3d98b 35%, #d4af37 55%, #fff1c4 75%, #b8892b 100%); }
+.royal .grid-fade { opacity: 0.6; }
+.royal .blob { opacity: 0.16; }
+.royal ::selection { background: rgb(212 175 55 / 0.35); color: #fff; }
+.gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.gold-frame { position: relative; }
+.gold-frame::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgb(243 217 139 / 0.7), rgb(212 175 55 / 0.08) 40%, rgb(212 175 55 / 0.08) 60%, rgb(243 217 139 / 0.6)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.shimmer { position: relative; overflow: hidden; }
+.shimmer::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%); transform: translateX(-120%); animation: shimmer 3.6s ease-in-out infinite; }
+@keyframes shimmer { 60%, 100% { transform: translateX(120%); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

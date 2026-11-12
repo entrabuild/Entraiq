@@ -3,6 +3,7 @@ import * as D from "@radix-ui/react-dialog";
 import { Calculator, ChevronDown, ExternalLink, X } from "lucide-react";
 import * as React from "react";
 import { Button, cn } from "@/components/ui";
+import { ROYAL } from "@/app/site-fonts";
 import { clearHash, useHash } from "./use-browser";
 import { calculate, ECOMMERCE_CALCS, FEE_CONFIGS, isCalcId, QUICK_CALCS, type CalcId, type FeeConfig, type Zone } from "@/lib/site/fees";
 
@@ -159,14 +160,14 @@ export function FeeCalculatorModal() {
     <D.Root open={!!cfg} onOpenChange={(o) => !o && close()}>
       <D.Portal>
         <D.Overlay className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-[2px]" />
-        <D.Content className="overlay-in fixed top-1/2 left-1/2 z-[60] flex max-h-[90vh] w-[calc(100vw-1.5rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border border-line bg-surface shadow-card">
+        <D.Content className={`${ROYAL} overlay-in fixed top-1/2 left-1/2 z-[60] flex max-h-[90vh] w-[calc(100vw-1.5rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border border-line shadow-card`}>
           {cfg && (
             <>
               <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent"><Calculator className="size-4.5" /></span>
                   <div>
-                    <D.Title className="text-[16px] font-semibold">{cfg.name} fee calculator</D.Title>
+                    <D.Title className="font-royal text-[22px]">{cfg.name} fee calculator</D.Title>
                     <D.Description className="text-[12.5px] text-muted">{cfg.blurb}</D.Description>
                   </div>
                 </div>

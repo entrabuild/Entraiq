@@ -42,8 +42,7 @@ export const SITE = {
   portfolio: [
     { name: "Nordic Affairs Media", place: "Sweden", work: "Website rebuild with a ticket booking platform", tags: ["Next.js", "Booking", "Chatbot"], url: "https://nordicaffairsmedia.com", hue: 212 },
     { name: "Pavana Silks", place: "Tamil Nadu", work: "Cinematic scroll-driven brand website and social media management", tags: ["Brand site", "Social media"], url: "", hue: 345 },
-    { name: "Bhuvannam Silks", place: "Tamil Nadu", work: "E-commerce store with a shopping chatbot and admin dashboard", tags: ["E-commerce", "Chatbot", "Admin"], url: "", hue: 28 },
-    { name: "R.S.A Construction", place: "Tamil Nadu", work: "Custom business software for a construction company", tags: ["Custom software"], url: "", hue: 160 },
+    { name: "TNWLA Madras", place: "Chennai", work: "Website for the Tamilnadu Women Law Association", tags: ["Website", "Association"], url: "https://tnwla-madras.com", hue: 268 },
   ],
 } as const;
 

@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight, ArrowUpRight, Bot, Calculator, ClipboardCheck, Code2, Globe2, LineChart, Megaphone, Palette, Radar, ScanSearch, Search, Share2, ShoppingCart, Smartphone, Sparkles, Store, TrendingUp, Warehouse } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Bot, Calculator, ClipboardCheck, Code2, Globe2, LineChart, Megaphone, Palette, Radar, ScanSearch, Search, Share2, ShoppingCart, Smartphone, Store, TrendingUp, Warehouse } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { cn } from "@/components/ui";
@@ -25,8 +25,8 @@ export function SectionHead({ id, eyebrow, title, accent, body, center }: { id?:
   return (
     <Reveal className={cn("max-w-2xl scroll-mt-20", center && "mx-auto text-center")}>
       <div id={id} className="scroll-mt-24" />
-      <p className={cn("inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent-soft px-2.5 py-1 text-[11.5px] font-semibold tracking-wide text-accent")}><Sparkles className="size-3" />{eyebrow}</p>
-      <h2 className="mt-3 text-[28px] leading-tight font-semibold text-balance sm:text-[36px]">{title}{accent && <> <span className="text-gradient">{accent}</span></>}</h2>
+      <p className={cn("inline-flex items-center gap-2 text-[11.5px] font-semibold tracking-[0.28em] text-accent", center && "justify-center")}><span className="gold-rule w-8" />{eyebrow}<span className="gold-rule w-8" /></p>
+      <h2 className="mt-3 text-[34px] leading-[1.08] text-balance sm:text-[46px]">{title}{accent && <> <span className="text-gradient">{accent}</span></>}</h2>
       {body && <p className="mt-3 text-[15.5px] text-muted">{body}</p>}
     </Reveal>
   );
@@ -44,13 +44,13 @@ function HeroVisual() {
   const bars = [38, 52, 46, 64, 58, 76, 70, 88, 82, 96];
   return (
     <div className="relative mx-auto w-full max-w-lg">
-      <div className="float-y rounded-2xl border border-line bg-surface/90 p-4 shadow-card backdrop-blur">
+      <div className="float-y gold-frame rounded-2xl border border-line bg-surface/90 p-5 shadow-card backdrop-blur">
         <div className="flex items-center justify-between">
           <p className="text-[13px] font-semibold">Brand growth · last 10 weeks</p>
           <span className="rounded-md bg-warn-soft px-1.5 py-0.5 text-[10.5px] font-medium text-warn">Illustration</span>
         </div>
         <div className="mt-4 flex h-36 items-end gap-2" aria-hidden>
-          {bars.map((h, i) => <div key={i} className="bar-grow flex-1 rounded-t-md bg-gradient-to-t from-accent to-ai" style={{ height: `${h}%`, animationDelay: `${i * 70}ms` }} />)}
+          {bars.map((h, i) => <div key={i} className="bar-grow flex-1 rounded-t-md bg-gradient-to-t from-[#8a6a1f] via-accent to-[#f3d98b]" style={{ height: `${h}%`, animationDelay: `${i * 70}ms` }} />)}
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-[11.5px]">
           {[["Website", Globe2], ["Marketplaces", Store], ["Social", Share2]].map(([l, I]) => {
@@ -79,13 +79,13 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-10 pb-20 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
         <div className="min-w-0">
           <p className="overlay-in inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3 py-1 text-[12px] text-muted backdrop-blur"><span className="size-1.5 rounded-full bg-pos" />Websites · Marketing · Marketplace platform</p>
-          <h1 className="mt-5 text-[38px] leading-[1.06] font-semibold tracking-tight text-balance sm:text-[56px]">
+          <h1 className="mt-6 text-[46px] leading-[1.02] text-balance sm:text-[72px]">
             Build your brand.<br />Sell more on <RotatingWord />
           </h1>
           <p className="mt-5 max-w-xl text-[16.5px] text-muted">Entraiot builds fast e-commerce websites, runs your SEO and social media, and gives agencies ENTRAIQ — one screen for every seller on every marketplace.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#enquiry" className="group inline-flex h-11 items-center gap-2 rounded-lg bg-accent px-5 text-[14.5px] font-semibold text-accent-ink shadow-card hover:brightness-110">Get free consultation<ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" /></a>
-            <a href="#tools" className="inline-flex h-11 items-center gap-2 rounded-lg border border-line bg-surface/80 px-5 text-[14.5px] font-semibold backdrop-blur hover:bg-raised">Try free tools</a>
+            <a href="#enquiry" className="shimmer group inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#f3d98b] via-accent to-[#b8892b] px-6 text-[14.5px] font-semibold text-accent-ink shadow-card hover:brightness-110">Get free consultation<ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" /></a>
+            <a href="#tools" className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong bg-surface/60 px-6 text-[14.5px] font-semibold text-accent backdrop-blur hover:bg-raised">Try free tools</a>
           </div>
           <p className="mt-5 text-[13px] text-muted">Talk to us: <a href={`tel:${SITE.contact.phones[0].replace(/[^+\d]/g, "")}`} className="font-medium text-ink hover:text-accent">{SITE.contact.phones[0]}</a> · <a href={`mailto:${SITE.contact.email}`} className="font-medium text-ink hover:text-accent">{SITE.contact.email}</a></p>
         </div>
@@ -127,9 +127,9 @@ export function Services() {
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SERVICE_CARDS.map((s, i) => (
           <Reveal key={s.title} delay={i * 60}>
-            <a href="#enquiry" className="group flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-all hover:-translate-y-1 hover:border-accent/50 hover:shadow-card">
-              <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-ai text-white shadow-sm transition-transform group-hover:scale-110"><s.icon className="size-5" /></span>
-              <p className="mt-4 text-[16px] font-semibold">{s.title}</p>
+            <a href="#enquiry" className="gold-frame group flex h-full flex-col rounded-2xl border border-line bg-surface/80 p-6 backdrop-blur transition-all hover:-translate-y-1.5 hover:shadow-card">
+              <span className="flex size-12 items-center justify-center rounded-full border border-line-strong bg-gradient-to-br from-[#f3d98b]/20 to-transparent text-accent transition-transform group-hover:scale-110"><s.icon className="size-5" /></span>
+              <p className="font-royal mt-4 text-[21px]">{s.title}</p>
               <p className="mt-1.5 flex-1 text-[13.5px] text-muted">{s.body}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-[13px] font-semibold text-accent">Talk to us<ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" /></span>
             </a>
@@ -159,7 +159,7 @@ export function Strategy() {
             {STRATEGY.map((s, i) => (
               <Reveal key={s.title} delay={i * 90} className="text-center">
                 <li className="list-none">
-                  <span className="relative mx-auto flex size-14 items-center justify-center rounded-2xl border border-line bg-surface shadow-card"><s.icon className="size-6 text-accent" /><span className="tnum absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-accent-ink">{i + 1}</span></span>
+                  <span className="gold-frame relative mx-auto flex size-16 items-center justify-center rounded-full border border-line bg-surface shadow-card"><s.icon className="size-6 text-accent" /><span className="tnum absolute -top-1.5 -right-1.5 flex size-6 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-accent-ink">{i + 1}</span></span>
                   <p className="mt-4 text-[15px] font-semibold">{s.title}</p>
                   <p className="mt-1 text-[13px] text-muted">{s.body}</p>
                 </li>
@@ -196,11 +196,11 @@ export function Portfolio() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <SectionHead center id="work" eyebrow="RECENT PROJECTS" title="Websites and software" accent="we've delivered" body="Real projects from Entraiot's team, for brands in India and abroad." />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {SITE.portfolio.map((p, i) => (
           <Reveal key={p.name} delay={i * 80}>
-            <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-all hover:-translate-y-1 hover:shadow-card">
-              <div className="relative h-36 overflow-hidden" style={{ background: `linear-gradient(135deg, hsl(${p.hue} 70% 45%), hsl(${(p.hue + 40) % 360} 75% 60%))` }} aria-hidden>
+            <div className="gold-frame group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-all hover:-translate-y-1.5 hover:shadow-card">
+              <div className="relative h-44 overflow-hidden" style={{ background: `radial-gradient(120% 90% at 20% 0%, hsl(${p.hue} 55% 38%), #0b1026 75%)` }} aria-hidden>
                 <div className="absolute inset-x-4 top-4 bottom-0 rounded-t-lg bg-white/90 p-2 shadow-lg transition-transform duration-500 group-hover:translate-y-[-6px] dark:bg-black/60">
                   <div className="flex gap-1"><span className="size-1.5 rounded-full bg-neg" /><span className="size-1.5 rounded-full bg-warn" /><span className="size-1.5 rounded-full bg-pos" /></div>
                   <div className="mt-2 h-2 w-2/3 rounded bg-black/15 dark:bg-white/25" /><div className="mt-1.5 h-2 w-1/2 rounded bg-black/10 dark:bg-white/15" />
@@ -208,7 +208,7 @@ export function Portfolio() {
                 </div>
               </div>
               <div className="flex flex-1 flex-col p-4">
-                <p className="text-[15.5px] font-semibold">{p.name}</p>
+                <p className="font-royal text-[22px]">{p.name}</p>
                 <p className="text-[12px] text-faint">{p.place}</p>
                 <p className="mt-2 flex-1 text-[13px] text-muted">{p.work}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">{p.tags.map((t) => <span key={t} className="rounded-md bg-raised px-1.5 py-0.5 text-[11px] text-muted">{t}</span>)}</div>
@@ -243,8 +243,8 @@ export function TechStack() {
           </div>
           <div role="tabpanel" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {STACK[k].map((t, i) => (
-              <div key={`${k}-${t}`} className="overlay-in flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-surface p-4 text-center" style={{ animationDelay: `${i * 50}ms` }}>
-                <span className="flex size-11 items-center justify-center rounded-xl text-[15px] font-bold text-white" style={{ background: `hsl(${(t.length * 47 + i * 30) % 360} 60% 50%)` }}>{t.replace(/[^A-Za-z]/g, "").slice(0, 2)}</span>
+              <div key={`${k}-${t}`} className="overlay-in gold-frame flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-surface p-4 text-center" style={{ animationDelay: `${i * 50}ms` }}>
+                <span className="font-royal flex size-12 items-center justify-center rounded-full border border-line-strong bg-gradient-to-br from-[#f3d98b]/25 to-transparent text-[18px] font-bold text-accent">{t.replace(/[^A-Za-z]/g, "").slice(0, 2)}</span>
                 <span className="text-[13px] font-medium"><Code2 className="mr-1 inline size-3.5 text-faint" />{t}</span>
               </div>
             ))}
@@ -275,15 +275,15 @@ export function SocialSection() {
               {stats.map((s) => <div key={s.label} className="px-4 py-3"><p className="tnum text-[22px] font-semibold text-accent">{s.value}</p><p className="text-[12px] text-muted">{s.label}</p></div>)}
             </div>
           )}
-          <a href="#enquiry" className="mt-7 inline-flex h-11 items-center gap-2 rounded-lg bg-accent px-5 text-[14.5px] font-semibold text-accent-ink hover:brightness-110">Get a free strategy call<ArrowRight className="size-4" /></a>
+          <a href="#enquiry" className="shimmer mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#f3d98b] via-accent to-[#b8892b] px-6 text-[14.5px] font-semibold text-accent-ink hover:brightness-110">Get a free strategy call<ArrowRight className="size-4" /></a>
         </Reveal>
       </div>
       <Reveal className="relative mx-auto aspect-square w-full max-w-[420px]">
-        <div className="absolute inset-[12%] rounded-full bg-gradient-to-br from-accent-soft to-ai-soft" aria-hidden />
+        <div className="absolute inset-[12%] rounded-full bg-[radial-gradient(circle,rgb(212_175_55/0.22),transparent_70%)]" aria-hidden />
         <div className="absolute inset-[4%] rounded-full border border-dashed border-line-strong" aria-hidden />
-        <div className="absolute top-1/2 left-1/2 flex h-[46%] w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col rounded-[18px] border-4 border-ink/80 bg-surface p-1.5 shadow-card" aria-hidden>
+        <div className="absolute top-1/2 left-1/2 flex h-[46%] w-[26%] -translate-x-1/2 -translate-y-1/2 flex-col rounded-[18px] border-4 border-accent/70 bg-surface p-1.5 shadow-card" aria-hidden>
           <div className="mx-auto h-1 w-6 rounded-full bg-line-strong" />
-          <div className="mt-2 h-1/3 rounded-md bg-gradient-to-br from-accent to-ai" />
+          <div className="mt-2 h-1/3 rounded-md bg-gradient-to-br from-[#f3d98b] to-[#8a6a1f]" />
           <div className="mt-1.5 h-1.5 w-3/4 rounded bg-line-strong" /><div className="mt-1 h-1.5 w-1/2 rounded bg-line" />
           <div className="mt-auto flex justify-around pb-1"><span className="size-2 rounded-full bg-neg" /><span className="size-2 rounded-full bg-accent" /><span className="size-2 rounded-full bg-pos" /></div>
         </div>
@@ -293,7 +293,7 @@ export function SocialSection() {
             return (
               <div key={p.name} className="absolute" style={{ left: `${50 + 46 * Math.cos(a)}%`, top: `${50 + 46 * Math.sin(a)}%`, transform: "translate(-50%,-50%)" }}>
                 <div className="orbit-counter">
-                  <span className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-semibold shadow-card">
+                  <span className="flex items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 py-1.5 text-[12px] font-semibold shadow-card">
                     <span className="size-2.5 rounded-full" style={{ background: p.mono ? "var(--ink)" : `hsl(${p.hue} 75% 50%)` }} />{p.name}
                   </span>
                 </div>
@@ -310,13 +310,13 @@ export function SocialSection() {
 export function CtaBand() {
   return (
     <section className="px-4 pb-20 sm:px-6">
-      <Reveal className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-gradient-to-br from-accent to-ai px-6 py-12 text-center text-white sm:px-12">
-        <div className="blob top-[-80px] left-[-60px] size-[260px] bg-white" aria-hidden />
+      <Reveal className="gold-frame relative mx-auto max-w-6xl overflow-hidden rounded-3xl border border-line bg-[radial-gradient(90%_120%_at_50%_0%,rgb(212_175_55/0.22),#0b1026_70%)] px-6 py-14 text-center sm:px-12">
+        <div className="gold-rule mx-auto mb-6 w-24" aria-hidden />
         <h2 className="relative text-[28px] leading-tight font-semibold text-balance sm:text-[36px]">Ready to grow? Let&apos;s plan it together.</h2>
-        <p className="relative mx-auto mt-3 max-w-xl text-[15.5px] text-white/85">A free 30-minute call. We look at your website, listings and ads, and tell you the three things that would make the biggest difference.</p>
+        <p className="relative mx-auto mt-3 max-w-xl text-[15.5px] text-muted">A free 30-minute call. We look at your website, listings and ads, and tell you the three things that would make the biggest difference.</p>
         <div className="relative mt-7 flex flex-wrap justify-center gap-3">
-          <a href="#enquiry" className="inline-flex h-11 items-center rounded-lg bg-white px-5 text-[14.5px] font-semibold text-[#1d2a6b] hover:bg-white/90">Get free consultation</a>
-          <Link href="/signup" className="inline-flex h-11 items-center rounded-lg border border-white/40 px-5 text-[14.5px] font-semibold hover:bg-white/10">Start an ENTRAIQ workspace</Link>
+          <a href="#enquiry" className="shimmer inline-flex h-12 items-center rounded-full bg-gradient-to-r from-[#f3d98b] via-accent to-[#b8892b] px-6 text-[14.5px] font-semibold text-accent-ink hover:brightness-110">Get free consultation</a>
+          <Link href="/signup" className="inline-flex h-12 items-center rounded-full border border-line-strong px-6 text-[14.5px] font-semibold text-accent hover:bg-raised">Start an ENTRAIQ workspace</Link>
         </div>
       </Reveal>
     </section>
