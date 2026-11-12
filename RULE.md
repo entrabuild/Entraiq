@@ -66,6 +66,7 @@ against demo state:
 | J | **Clients** | Agency view: client list/profile, team, accounts, activity, reports, add-client onboarding |
 | K | **Admin/Settings** | Users, roles, permissions (RBAC), workspace/brand/AI settings, notifications, audit log, Reset Demo Data |
 | L | **Public website** (`/`) — production | Entraiot's live site (tech services only — no seller account management, so we never compete with agencies using ENTRAIQ): animated hero, services, strategy, free tools (listing check with auto-fix to 100/100; 9 marketplace fee calculators as pop-ups), portfolio, technology stack, social media marketing, ENTRAIQ platform + pricing, FAQ, enquiry form, full footer, sticky WhatsApp/Call bar, policies, SEO (sitemap, robots, structured data, preview image). `/signup` creates a browser workspace; `/leads` lists website leads; platform preview at `/login` stays clearly labelled sample data. Settings in `src/config/site.ts`; see `docs/WEBSITE.md` |
+| M | **Live test** (`/account`) — real | Email-link sign-in limited to `LIVE_ALLOWED_EMAILS`; website enquiries stored and emailed; real Facebook Page / Instagram posting with likes and comments read back; Amazon/Flipkart report upload with totals and charts. Shows a setup checklist (names only, never values) and reports missing setup honestly. Dashboards elsewhere stay sample data. See `docs/LIVE_TEST.md` |
 
 **Cross-cutting, in scope:** consistent app shell (collapsible sidebar, topbar), global date-range
 / marketplace / client selectors, dark + light themes, responsive down to 390px, demo state

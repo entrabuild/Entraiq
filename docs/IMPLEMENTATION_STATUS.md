@@ -3,6 +3,10 @@
 _Last verified: production build ✅, `typecheck` ✅, `verify:data` ✅, 60-check e2e smoke ✅
 (0 console errors)._
 
+## Live test
+
+`/account` is real (sign-in, enquiry alerts, Facebook/Instagram posting, sales report uploads) once its environment variables are set. See `LIVE_TEST.md`. Every other screen remains sample data.
+
 ## Acceptance criteria (§13 of the brief)
 
 | Criterion | Status |

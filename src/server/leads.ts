@@ -1,5 +1,7 @@
 import "server-only";
 import { leadSummary, type Lead } from "@/lib/site/leads";
+import { dbConfigured, newId, sql } from "./db";
+import { mailConfigured, sendMail } from "./mail";
 
 /**
  * Lead alerts. If LEAD_WEBHOOK_URL is set, every enquiry is POSTed there as JSON
@@ -8,6 +10,34 @@ import { leadSummary, type Lead } from "@/lib/site/leads";
  * If it is not set, the alert is reported as "pending_configuration" — never as sent.
  */
 export async function sendLeadAlert(lead: Lead, reference: string): Promise<"sent" | "pending_configuration" | "failed"> {
+  const results = await Promise.all([emailAlert(lead, reference), webhookAlert(lead, reference)]);
+  const outcome = results.includes("sent") ? "sent" : results.includes("failed") ? "failed" : "pending_configuration";
+  await saveLead(lead, reference, outcome);
+  return outcome;
+}
+
+/** Live test: keep every enquiry in the database so it survives across browsers and devices. */
+async function saveLead(lead: Lead, reference: string, alert: string): Promise<void> {
+  if (!dbConfigured()) return;
+  try {
+    await sql(`INSERT INTO live_leads (id, reference, kind, name, email, phone, business, interest, message, alert) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`, [
+      newId(), reference, lead.kind, lead.name, lead.email, lead.phone, lead.agency || null,
+      lead.kind === "enquiry" ? lead.interest : lead.marketplaces.join(", "),
+      lead.kind === "signup" ? null : lead.message || null, alert,
+    ]);
+  } catch (e) {
+    console.error("[leads] could not save", e instanceof Error ? e.message : e);
+  }
+}
+
+/** Live test: email each enquiry to ALERT_EMAIL (Shalini) through Resend. */
+async function emailAlert(lead: Lead, reference: string): Promise<"sent" | "pending_configuration" | "failed"> {
+  const to = process.env.ALERT_EMAIL;
+  if (!to || !mailConfigured()) return "pending_configuration";
+  return (await sendMail(to, `New website lead ${reference} — ${lead.name}`, leadSummary(lead, reference))) ? "sent" : "failed";
+}
+
+async function webhookAlert(lead: Lead, reference: string): Promise<"sent" | "pending_configuration" | "failed"> {
   const url = process.env.LEAD_WEBHOOK_URL;
   if (!url) return "pending_configuration";
   try {

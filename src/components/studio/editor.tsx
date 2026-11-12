@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { DemoGeneratedTag, toast } from "@/components/shared";
-import { Badge, Button, Field, Input, Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger, Modal, Select, Skeleton, Textarea, Tip, cn } from "@/components/ui";
+import { Badge, Button, Field, Input, Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger, Modal, Select, Skeleton, Textarea, Tip, cn } from "@/components/ui";
 import type { CopyResult, CopyTone } from "@/lib/ai/copy";
 import { getAIProvider } from "@/lib/ai/provider";
 import { newId, now, useCan, useStore, type Upload } from "@/lib/store";
@@ -164,6 +164,15 @@ export function StudioEditor({ project }: { project: CreativeProject }) {
     a.click();
     log(`Exported creative as ${mime === "image/png" ? "PNG" : "JPEG"}`, name);
     toast(doc.els.some((e) => e.placeholder && e.visible) ? "Exported. Note: the product image slot is still empty." : `Exported ${doc.width} × ${doc.height} ${mime === "image/png" ? "PNG" : "JPEG"}`);
+  };
+  /** Hands the creative to the live account page, which posts it to real Facebook / Instagram accounts. */
+  const sendToLive = () => {
+    if (!api.current) return;
+    const url = api.current.toDataURL("image/jpeg", Math.min(doc.width, 1440));
+    try { sessionStorage.setItem("entraiq-live-creative", JSON.stringify({ url, name: name.trim() || "Creative" })); }
+    catch { toast("This creative is too large to hand over. Export it as JPEG and upload it on the live page."); return; }
+    log("Sent creative to live publishing", name);
+    router.push("/account#meta");
   };
   const duplicateDesign = () => { const id = newId(); saveProject({ ...project, id, name: `${name} copy`, doc, createdAt: now(), updatedAt: now() }); toast("Duplicated. You are now editing the copy."); router.push(`/studio/editor?id=${id}`); };
 
@@ -372,7 +381,7 @@ export function StudioEditor({ project }: { project: CreativeProject }) {
           <Button onClick={saveNow} disabled={!canEdit}><Save /><span className="hidden sm:inline">Save</span></Button>
           <Menu>
             <MenuTrigger asChild><Button variant="primary"><Download />Export<ChevronDown /></Button></MenuTrigger>
-            <MenuContent><MenuLabel>{doc.width} × {doc.height} px</MenuLabel><MenuItem onSelect={() => setTimeout(() => exportAs("image/png"), 60)}>PNG — lossless</MenuItem><MenuItem onSelect={() => setTimeout(() => exportAs("image/jpeg"), 60)}>JPEG — smaller file</MenuItem></MenuContent>
+            <MenuContent><MenuLabel>{doc.width} × {doc.height} px</MenuLabel><MenuItem onSelect={() => setTimeout(() => exportAs("image/png"), 60)}>PNG — lossless</MenuItem><MenuItem onSelect={() => setTimeout(() => exportAs("image/jpeg"), 60)}>JPEG — smaller file</MenuItem><MenuSeparator /><MenuItem onSelect={() => { setSel(null); setTimeout(sendToLive, 60); }}>Post to Facebook / Instagram (live)…</MenuItem></MenuContent>
           </Menu>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Toggle properties" onClick={() => setRightOpen((o) => !o)}><SlidersHorizontal /></Button>
         </div>

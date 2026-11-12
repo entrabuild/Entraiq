@@ -53,7 +53,7 @@ export default function LoginPage() {
         </div>
         <p className="text-[12px] text-faint">© {new Date().getFullYear()} {BRAND_DEFAULTS.companyLegal}</p>
       </section>
-      <section className="flex items-center justify-center px-6 py-10 sm:px-12">
+      <section className="flex flex-col items-center justify-center px-6 py-10 sm:px-12">
         <form onSubmit={handleSubmit(enter)} className="w-full max-w-sm" noValidate>
           <p className="text-[11.5px] font-semibold tracking-wide text-accent">DEMO ENVIRONMENT</p>
           <h2 className="mt-1 text-[22px] font-semibold">Enter the demo workspace</h2>
@@ -71,6 +71,7 @@ export default function LoginPage() {
             Demo entry does not check a password. Production sign-in (Auth.js, role-based access, tenant isolation) is specified in the project documentation and is not active in this build.
           </p>
         </form>
+        <p className="mt-6 w-full max-w-sm text-center text-[12.5px] text-muted">Testing with your own real accounts? <Link href="/account" className="font-medium text-accent hover:underline">Open the live test</Link></p>
       </section>
     </div>
   );
