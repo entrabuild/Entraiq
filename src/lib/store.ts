@@ -31,6 +31,9 @@ export interface AppUser { id: string; name: string; email: string; role: Role; 
 export interface AuditEntry { id: string; ts: number; actor: string; action: string; target: string }
 export interface ReportRecord { id: string; ts: number; type: string; title: string; client: string; range: string; format: "CSV" | "PDF"; rows: number; by: string }
 export interface Upload { id: string; name: string; src: string; w: number; h: number }
+/** An enquiry or sign-up sent from the public website in this browser (the server copy goes to the alert webhook). */
+export interface SiteLead { id: string; ts: number; kind: "demo" | "signup"; reference: string; name: string; agency: string; email: string; phone: string; sellers: string; marketplaces: string[]; alert: "sent" | "pending_configuration" | "failed" | "not_sent" }
+export interface AgencyWorkspace { agency: string; owner: string; email: string; sellersPlanned: number; marketplaces: string[]; createdAt: number }
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -54,6 +57,8 @@ const initial = () => ({
   permissions: DEFAULT_PERMS,
   customClients: [] as Client[],
   clientTeams: {} as Record<string, string[]>,
+  siteLeads: [] as SiteLead[],
+  workspace: null as AgencyWorkspace | null,
   settings: {
     workspaceName: "ENTRAIOT Agency Workspace",
     timezone: "Asia/Kolkata",
@@ -78,6 +83,8 @@ interface Actions {
   addReport: (r: Omit<ReportRecord, "id" | "ts" | "by">) => void;
   updateSettings: (fn: (s: Data["settings"]) => Data["settings"]) => void;
   resetDemo: () => void;
+  addSiteLead: (l: Omit<SiteLead, "id" | "ts">) => void;
+  createWorkspace: (w: Omit<AgencyWorkspace, "createdAt">) => void;
 }
 
 export const toastBus: { push: (msg: string, tone?: "ok" | "error") => void } = { push: () => {} };
@@ -114,7 +121,18 @@ export const useStore = create<Data & Actions>()(
       deleteProject: (id) => set((s) => ({ projects: s.projects.filter((x) => x.id !== id) })),
       addReport: (r) => { set((s) => ({ reports: [{ ...r, id: uid(), ts: Date.now(), by: s.session?.name ?? "Demo user" }, ...s.reports].slice(0, 50) })); get().log(`Exported ${r.format} report`, r.title); },
       updateSettings: (fn) => set((s) => ({ settings: fn(s.settings) })),
-      resetDemo: () => { const { session, theme } = get(); set({ ...initial(), session, theme }); get().log("Reset demo data", "Workspace"); },
+      resetDemo: () => { const { session, theme, siteLeads, workspace } = get(); set({ ...initial(), session, theme, siteLeads, workspace, settings: { ...initial().settings, workspaceName: workspace ? `${workspace.agency} workspace` : initial().settings.workspaceName } }); get().log("Reset demo data", "Workspace"); },
+      addSiteLead: (l) => set((s) => ({ siteLeads: [{ ...l, id: uid(), ts: Date.now() }, ...s.siteLeads].slice(0, 100) })),
+      createWorkspace: (w) => {
+        const workspace = { ...w, createdAt: Date.now() };
+        set((s) => ({
+          workspace,
+          settings: { ...s.settings, workspaceName: `${w.agency} workspace` },
+          users: [{ id: uid(), name: w.owner, email: w.email, role: "admin" as Role, status: "active" as const }, ...s.users.filter((u) => u.email !== w.email)],
+          session: { name: w.owner, email: w.email, role: "admin" },
+        }));
+        get().log("Created agency workspace from website sign-up (demo state)", w.agency);
+      },
     }),
     {
       name: "entraiq-demo-v1",

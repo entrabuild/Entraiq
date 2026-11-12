@@ -155,7 +155,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
               <MenuItem asChild><Link href="/settings"><Settings />Settings</Link></MenuItem>
               <MenuItem onSelect={() => setConfirmReset(true)}><RotateCcw />Reset demo data</MenuItem>
               <MenuSeparator />
-              <MenuItem onSelect={() => { signOut(); router.push("/"); }}><LogOut />Sign out</MenuItem>
+              <MenuItem onSelect={() => { signOut(); router.push("/login"); }}><LogOut />Sign out</MenuItem>
             </MenuContent>
           </Menu>
         </div>

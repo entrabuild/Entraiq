@@ -43,6 +43,7 @@ _Last verified: production build ✅, `typecheck` ✅, `verify:data` ✅, 60-che
 | I. Reports | ✅ | Sales/ads/marketplace/product/campaign; CSV + PDF export |
 | J. Client management | ✅ | Client list/profile, team, accounts, activity, reports; add-client onboarding |
 | K. Admin settings | ✅ | Users, roles, permissions (RBAC), workspace/brand/AI settings, notifications, audit log |
+| L. Public website | ✅ (not yet build-verified) | `/` product site, `/signup` self sign-up → demo workspace, `/leads` Website leads, `POST /api/v1/leads` with zod validation, rate limit, honeypot and webhook alert; demo entry moved to `/login` |
 
 Phases 1–8 (foundation → dashboard → marketplaces → advertising → AI → studio → client/admin → QA)
 are complete.
@@ -70,6 +71,8 @@ log for key actions; `.env*` gitignored. Full OAuth/session backend is out of sc
 - No live marketplace/Meta data: `exchangeCode`/`refresh`/`sync` throw by design.
 - The entry screen is a demo gate, not authentication.
 - AI output is rule-based over sample data, surfaced as demo-generated — not a hosted model.
+
+- Website sign-up creates the workspace in the browser only; lead alerts need `LEAD_WEBHOOK_URL`.
 
 ## Suggested next steps
 

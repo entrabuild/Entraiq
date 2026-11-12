@@ -21,7 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const path = usePathname();
   const [navOpen, setNavOpen] = React.useState(false);
-  React.useEffect(() => { if (hydrated && !session) router.replace("/"); }, [hydrated, session, router]);
+  React.useEffect(() => { if (hydrated && !session) router.replace("/login"); }, [hydrated, session, router]);
   if (!hydrated || !session) return <ShellSkeleton />;
   const fullBleed = path.startsWith("/studio/editor");
   return (

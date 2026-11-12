@@ -36,7 +36,7 @@ await step("API", async () => {
 // ---- Entry ---------------------------------------------------------------------------------------
 await step("demo entry", async () => {
   await page.goto(`${BASE}/overview`);
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(`${BASE}/login`);
   check(true, "unauthenticated visit to /overview redirects to the demo entry");
   await page.getByLabel("Your name").fill("");
   await page.getByRole("button", { name: "Enter demo workspace" }).click();
@@ -293,7 +293,7 @@ await step("settings", async () => {
   check(s.projects.length === 0 && s.customCampaigns.length === 0 && s.reports.length === 0 && s.customClients.length === 0, "Reset Demo Data clears local changes");
   await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("menuitem", { name: "Sign out" }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(`${BASE}/login`);
   await page.getByLabel("View the workspace as").selectOption("viewer");
   await page.getByRole("button", { name: "Enter demo workspace" }).click();
   await page.waitForURL(/overview/);
@@ -317,6 +317,53 @@ await step("responsive", async () => {
   await page.goto(`${BASE}/overview`);
   await page.waitForTimeout(800);
   await shot("08-mobile-overview");
+});
+
+// ---- Public website & automations -----------------------------------------------------------------
+await step("website", async () => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const bad = await ctx.request.post(`${BASE}/api/v1/leads`, { data: { kind: "demo", name: "" } });
+  check(bad.status() === 422, "POST /api/v1/leads rejects an invalid enquiry with field errors");
+  await page.goto(`${BASE}/`);
+  await page.getByRole("heading", { name: "Run every seller you manage from one screen." }).waitFor();
+  check(true, "home page shows the ENTRAIQ website");
+  // Listing check
+  await page.getByRole("button", { name: "Check this listing" }).click();
+  check(await page.getByText("How this is scored:").isVisible(), "free listing check returns a scored report with its method");
+  // Fee calculator
+  await page.getByLabel("Seller accounts, exact number").fill("40");
+  check(await page.getByText("₹75,000").first().isVisible(), "fee calculator: 40 sellers = ₹75,000 a month");
+  // Demo request
+  await page.getByRole("button", { name: "Request a demo" }).click();
+  check(await page.getByText("Enter your name").isVisible(), "demo form validates required fields");
+  await page.getByLabel("Your name").fill("Smoke Test");
+  await page.getByLabel("Agency or company").fill("Test Agency");
+  await page.getByLabel("Work email").fill("smoke@example.com");
+  await page.getByLabel("Phone (WhatsApp preferred)").fill("+91 98765 43210");
+  await page.getByLabel("Sellers you manage").selectOption("11–25");
+  await page.getByRole("checkbox", { name: "Amazon" }).check();
+  await page.getByText("may contact me about ENTRAIQ").click();
+  await page.getByRole("button", { name: "Request a demo" }).click();
+  await page.getByText(/Your reference is ENQ-/).waitFor();
+  check(true, "demo request is accepted and returns a reference");
+  const overflow = await page.setViewportSize({ width: 390, height: 844 }).then(() => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth));
+  check(overflow <= 1, `no horizontal overflow on the website at 390px (overflow ${overflow}px)`);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await shot("09-website");
+  // Self sign-up → workspace
+  await page.goto(`${BASE}/signup?sellers=12`);
+  await page.getByLabel("Your name").fill("Smoke Owner");
+  await page.getByLabel("Agency name").fill("Smoke Growth Agency");
+  await page.getByLabel("Work email").fill("owner@example.com");
+  await page.getByLabel("Phone").fill("+91 90000 00000");
+  await page.getByText("may contact me about my workspace").click();
+  await page.getByRole("button", { name: "Create my workspace" }).click();
+  await page.waitForURL(/overview/);
+  const st = await state();
+  check(st.workspace?.agency === "Smoke Growth Agency" && st.settings.workspaceName === "Smoke Growth Agency workspace", "sign-up creates the agency workspace and signs the owner in");
+  await page.goto(`${BASE}/leads`);
+  await page.getByRole("heading", { name: "Website leads" }).waitFor();
+  check((await page.getByText(/^(ENQ|SGN)-/).count()) >= 2, "Website leads lists the demo request and the sign-up");
 });
 
 check(consoleErrors.length === 0, `no browser console errors across the run${consoleErrors.length ? ":\n        " + [...new Set(consoleErrors)].slice(0, 8).join("\n        ") : ""}`);

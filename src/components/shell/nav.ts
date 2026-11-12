@@ -1,4 +1,4 @@
-import { BarChart3, Building2, FileText, LayoutDashboard, LineChart, Megaphone, Package, Palette, Settings, ShoppingBag, ShoppingCart, Sparkles, Store, type LucideIcon } from "lucide-react";
+import { BarChart3, Building2, FileText, Inbox, LayoutDashboard, LineChart, Megaphone, Package, Palette, Settings, ShoppingBag, ShoppingCart, Sparkles, Store, type LucideIcon } from "lucide-react";
 
 export interface NavItem { href: string; label: string; icon: LucideIcon; badge?: string }
 export const NAV: { group: string; items: NavItem[] }[] = [
@@ -23,6 +23,7 @@ export const NAV: { group: string; items: NavItem[] }[] = [
   { group: "Agency", items: [
     { href: "/reports", label: "Reports", icon: FileText },
     { href: "/clients", label: "Clients", icon: Building2 },
+    { href: "/leads", label: "Website leads", icon: Inbox },
     { href: "/settings", label: "Settings", icon: Settings },
   ] },
 ];
